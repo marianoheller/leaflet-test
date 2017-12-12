@@ -1,0 +1,27 @@
+#mapid { 
+    height: 600px; 
+}
+
+
+.leaflet-popup > a.leaflet-popup-close-button {
+    display: none;
+}
+
+.leaflet-popup-content {
+    margin: 0.1rem;
+}
+
+.leaflet-popup-content > div > ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.contextMenuItem {
+    background-color: white;
+    color: black;
+}
+
+.contextMenuItem:hover {
+    background-color: black;
+    color: white
+}

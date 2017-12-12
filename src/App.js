@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import Map from './Map';
+import Map from './Map/Map';
 import './App.css';
 
 const KEY_IP_LOC = '02c1559982a189';
