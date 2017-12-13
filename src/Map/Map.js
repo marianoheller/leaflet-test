@@ -27,6 +27,7 @@ class Map extends Component {
         super(props);
 
         this.state = {
+            map: null,
             markerLayers: [],
         }
     }
@@ -36,36 +37,59 @@ class Map extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const markerLocs = this.state.markerLayers.map( (markLayer) => markLayer.getLatLng() );
+        const { map, markerLayers } = this.state;
+        if (!map) return;
         const newMarkerLocs = nextProps.markers;
+        const markerLocs = markerLayers.map( (markLayer) => {
+            const objLoc = markLayer.getLatLng();
+            return [ objLoc.lat, objLoc.lng ];
+        } );
 
-        //const toRemove = markerLocs.filter( (markerLoc) => newMarkerLocs.includes())
+        const indexesToRemove = [];
+
+        const toRemove = markerLocs.filter( (markerLoc, i) => newMarkerLocs.some( (newMark) => {
+            return newMark[0]===markerLoc[0] && newMark[1]===markerLoc[1];
+        }));
+        const toAdd = newMarkerLocs.filter( (newMark) => markerLocs.every( (markerLoc) => {
+            return markerLoc[0]!==newMark[0] && markerLoc[1]!==newMark[1];
+        }));
+        
+        toRemove.forEach( (e) => map.removeLayer(e) );
+        toAdd.forEach( (e) => L.marker(e).addTo(map) );
+        
+    }
+
+    handleAddLocation() {
+        console.log("ADD");
     }
 
     createMap() {
-        var { markers } = this.props;
+        const { markers } = this.props;
         
-        var map = L.map('mapid').setView( markers[0], 13);
+        const map = L.map('mapid').setView( markers[0], 13);
         L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
             maxZoom: 20,
             attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
 
-        var popup = L.popup().setContent(`
+        const popup = L.popup().setContent(`
         <div>
             <ul>
                 <li class="contextMenuItem">Add location</li>
-                <li class="contextMenuItem">asd</li>
+                <li class="contextMenuItem">asd</li>    
             </ul>
         </div>
-        `); 
-        map.on('contextmenu',function(e){
+        `);
+        map.on('contextmenu', (e) => {
             popup.setLatLng(e.latlng).openOn(map);
+            L.DomEvent.off(popup._contentNode);
+            L.DomEvent.on(popup._contentNode, this.handleAddLocation.bind(this));
         });
         const markerLayers = markers.map( (mark) => L.marker(mark) );
 
         markerLayers.forEach( (markerLayer) => markerLayer.addTo(map) );
         this.setState({
+            map: map,
             markerLayers: markerLayers
         });
     }
