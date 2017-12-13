@@ -1,7 +1,30 @@
 import React, { Component } from 'react';
-import L from 'leaflet';
+import L, { Popup } from 'leaflet';
 
-import './Map.css'
+import './Map.css';
+
+
+var markerIcon = L.icon({
+    iconUrl: './images/map-markers/marker-icon.png',
+    shadowUrl: './images/map-markers/marker-shadow.png',
+
+    iconSize:    [25, 41],
+    iconAnchor:  [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize:  [41, 41]
+});
+
+var markerSecIcon = L.icon({
+    iconUrl: './images/map-markers/marker-sec-icon.png',
+    shadowUrl: './images/map-markers/marker-sec-shadow.png',
+
+    iconSize:    [25, 41],
+    iconAnchor:  [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize:  [41, 41]
+});
 
 
 export default class MapContainer extends Component {
@@ -20,6 +43,10 @@ export default class MapContainer extends Component {
 }
 
 
+/**
+ * This component is wierd/wrong because Leaflet methods manipulate the DOM too.
+ * So it ends up being an hybrid between React and Leaflet (surely losing performance).
+ */
 
 class Map extends Component {
 
@@ -27,8 +54,9 @@ class Map extends Component {
         super(props);
 
         this.state = {
-            map: null,
+            map: undefined,
             markerLayers: [],
+            floatingMarker: undefined
         }
     }
 
@@ -74,19 +102,29 @@ class Map extends Component {
 
         const popup = L.popup().setContent(`
         <div>
-            <ul>
-                <li class="contextMenuItem">Add location</li>
-                <li class="contextMenuItem">asd</li>    
-            </ul>
+            Content del popup<br>
+            <button>Add destination</button>
         </div>
         `);
-        map.on('contextmenu', (e) => {
-            popup.setLatLng(e.latlng).openOn(map);
-            L.DomEvent.off(popup._contentNode);
-            L.DomEvent.on(popup._contentNode, this.handleAddLocation.bind(this));
-        });
-        const markerLayers = markers.map( (mark) => L.marker(mark) );
 
+        map.on('click', (e) => {
+            const { floatingMarker, map } = this.state;
+            if ( floatingMarker ) {
+                map.removeLayer(floatingMarker);
+                this.setState({
+                    floatingMarker: undefined
+                });
+            }
+            else {
+                const marker = new L.marker(e.latlng, { icon: markerSecIcon }).addTo(map);
+                //popup.setLatLng(e.latlng).openOn(map);
+                this.setState({
+                    floatingMarker: marker
+                });
+            }
+        });
+
+        const markerLayers = markers.map( (mark) => L.marker(mark, {icon: markerIcon}) );
         markerLayers.forEach( (markerLayer) => markerLayer.addTo(map) );
         this.setState({
             map: map,
@@ -94,9 +132,46 @@ class Map extends Component {
         });
     }
 
+    addMarker(loc) {
+        const { markerLayers, map } = this.state;
+        const newMarkerLayer = L.marker(loc, {icon: markerIcon}).addTo(map);
+        this.setState({
+            markerLayers: [ markerLayers, newMarkerLayer ],
+            floatingMarker: undefined
+        });
+    }
+
     render() {
+        const { floatingMarker } = this.state;
+        if( floatingMarker ) {
+            var floatingLoc = floatingMarker.getLatLng();
+            floatingLoc = [ floatingLoc.lat, floatingLoc.lng];
+        }
         return (
-            <div id="mapid"></div>            
+            <div>
+                <div id="mapid"></div>
+                { floatingMarker && 
+                    <PopUp loc={floatingLoc} addLocation={this.addMarker.bind(this)}/>
+                }
+            </div>
+        )
+    }
+}
+
+class PopUp extends Component {
+
+    handleAddLocation() {
+        const { addLocation, loc } = this.props;
+        addLocation(loc);
+    }
+
+    render() {
+        const { loc, addLocation } = this.props;
+        return (
+            <div className="popUpContainer">
+                <div>{`${loc[0]},${loc[1]}`}</div>
+                <button onClick={this.handleAddLocation.bind(this)}>Add location</button>
+            </div>
         )
     }
 }
