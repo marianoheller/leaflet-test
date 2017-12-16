@@ -3,6 +3,7 @@ import axios from 'axios';
 import Map from './Map/Map';
 import './App.css';
 
+
 const KEY_IP_LOC = '02c1559982a189';
 
 class App extends Component {
@@ -11,7 +12,7 @@ class App extends Component {
     super(props);
 
     this.state = {
-      initialLocation: undefined
+      initLoc: undefined
     }
   }
 
@@ -33,7 +34,7 @@ class App extends Component {
         throw e;
       }
       this.setState({
-        initialLocation: loc
+        initLoc: loc
       });
     })
     .catch( (err) => {
@@ -42,10 +43,10 @@ class App extends Component {
   }
 
   render() {
-    const { initialLocation } = this.state;
+    const { initLoc } = this.state;
     return (
       <div className="App">
-        <Map initialLocation={initialLocation}/>
+        <Map initLoc={initLoc}/>
       </div>
     );
   }

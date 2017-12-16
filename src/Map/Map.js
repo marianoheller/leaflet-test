@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import L, { Popup } from 'leaflet';
+import 'leaflet-easybutton';
 
+import 'bulma/css/bulma.css';
 import './Map.css';
 
 
@@ -30,14 +32,21 @@ var markerSecIcon = L.icon({
 export default class MapContainer extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
-            markers: [ props.initLoc || [34.6000,-58.4500] ]
+            markers: props.initLoc ? [ props.initLoc ] : []
         }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if( !nextProps.initLoc ) return;
+        this.setState({
+            markers: [ nextProps.initLoc ]
+        })
     }
 
     render() {
         const { markers } = this.state;
+        if (!markers.length) return <div>Error loading map. No initial location.</div>
         return <Map markers={markers}/>
     }
 }
@@ -87,17 +96,13 @@ class Map extends Component {
         
     }
 
-    handleAddLocation() {
-        console.log("ADD");
-    }
 
     createMap() {
         const { markers } = this.props;
         
         const map = L.map('mapid').setView( markers[0], 13);
         L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
-            maxZoom: 20,
-            attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            maxZoom: 17
         }).addTo(map);
 
         const popup = L.popup().setContent(`
@@ -117,15 +122,24 @@ class Map extends Component {
             }
             else {
                 const marker = new L.marker(e.latlng, { icon: markerSecIcon }).addTo(map);
-                //popup.setLatLng(e.latlng).openOn(map);
                 this.setState({
                     floatingMarker: marker
                 });
             }
         });
 
+        var helloPopup = L.popup().setContent('Hello World!');
+
         const markerLayers = markers.map( (mark) => L.marker(mark, {icon: markerIcon}) );
         markerLayers.forEach( (markerLayer) => markerLayer.addTo(map) );
+
+            
+        L.easyButton('<span class="star">&starf;</span>', (btn, map) => {
+            const { markerLayers } = this.state;
+            const group = new L.featureGroup(markerLayers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }).addTo( map );
+
         this.setState({
             map: map,
             markerLayers: markerLayers
@@ -135,8 +149,13 @@ class Map extends Component {
     addMarker(loc) {
         const { markerLayers, map } = this.state;
         const newMarkerLayer = L.marker(loc, {icon: markerIcon}).addTo(map);
+
+        //Zoom to fit every marker after adding
+        const group = new L.featureGroup( [ ...markerLayers, newMarkerLayer ]);
+        map.fitBounds(group.getBounds().pad(0.1));
+
         this.setState({
-            markerLayers: [ markerLayers, newMarkerLayer ],
+            markerLayers: [ ...markerLayers, newMarkerLayer ],
             floatingMarker: undefined
         });
     }
@@ -148,7 +167,7 @@ class Map extends Component {
             floatingLoc = [ floatingLoc.lat, floatingLoc.lng];
         }
         return (
-            <div>
+            <div className="mapContainer">
                 <div id="mapid"></div>
                 { floatingMarker && 
                     <PopUp loc={floatingLoc} addLocation={this.addMarker.bind(this)}/>
@@ -168,9 +187,11 @@ class PopUp extends Component {
     render() {
         const { loc, addLocation } = this.props;
         return (
-            <div className="popUpContainer">
-                <div>{`${loc[0]},${loc[1]}`}</div>
-                <button onClick={this.handleAddLocation.bind(this)}>Add location</button>
+            <div className="popUpContainer columns">
+                <div className="popUp column is-4 is-offset-4">
+                    <div>{`${loc[0]},${loc[1]}`}</div>
+                    <button onClick={this.handleAddLocation.bind(this)}>Add location</button>
+                </div>
             </div>
         )
     }

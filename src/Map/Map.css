@@ -1,7 +1,38 @@
-#mapid { 
-    height: 600px; 
+.mapContainer {
+    height: 100%;
 }
 
+#mapid { 
+    height: 100%; 
+    z-index: 10;
+}
+
+.easy-button-container > button {
+    color: black;
+    background-color: white;
+    /* border-width: 0; */
+    border-color: white;
+}
+.easy-button-container > button:hover {
+    background-color: #f4f4f4;
+}
+
+.star{
+    font-size: 1.5em;
+}
+
+.popUpContainer {
+    position: absolute;
+    bottom: 0; 
+    left: 0; 
+    width: 100%;
+    z-index: 99;
+}
+
+.popUp {
+    background-color: white;
+    color: black;
+}
 
 .leaflet-popup > a.leaflet-popup-close-button {
     display: none;
