@@ -148,14 +148,17 @@ class Map extends Component {
 
     addMarker(loc) {
         const { markerLayers, map } = this.state;
-        const newMarkerLayer = L.marker(loc, {icon: markerIcon}).addTo(map);
+        const newMarker = L.marker(loc, {icon: markerIcon}).addTo(map);
+        const newMarkers = [ ...markerLayers, newMarker ];
 
         //Zoom to fit every marker after adding
-        const group = new L.featureGroup( [ ...markerLayers, newMarkerLayer ]);
-        map.fitBounds(group.getBounds().pad(0.1));
+        if( newMarkers.some( (marker) => !map.getBounds().contains(marker.getLatLng()) )) {
+            const group = new L.featureGroup( newMarkers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
 
         this.setState({
-            markerLayers: [ ...markerLayers, newMarkerLayer ],
+            markerLayers: newMarkers,
             floatingMarker: undefined
         });
     }
@@ -188,9 +191,9 @@ class PopUp extends Component {
         const { loc, addLocation } = this.props;
         return (
             <div className="popUpContainer columns">
-                <div className="popUp column is-4 is-offset-4">
+                <div className="popUp column is-4 is-offset-4 has-text-centered">
                     <div>{`${loc[0]},${loc[1]}`}</div>
-                    <button onClick={this.handleAddLocation.bind(this)}>Add location</button>
+                    <button onClick={this.handleAddLocation.bind(this)}  className="button is-outlined" >Add location</button>
                 </div>
             </div>
         )
