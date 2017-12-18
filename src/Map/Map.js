@@ -33,21 +33,21 @@ export default class MapContainer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            markers: props.initLoc ? [ props.initLoc ] : []
+            locs: props.locs.length > 0 && props.locs[0] ? props.locs : []
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if( !nextProps.initLoc ) return;
+        if( !nextProps.locs ) return;
         this.setState({
-            markers: [ nextProps.initLoc ]
+            locs: nextProps.locs
         })
     }
 
     render() {
-        const { markers } = this.state;
-        if (!markers.length) return <div>Error loading map. No initial location.</div>
-        return <Map markers={markers}/>
+        const { locs } = this.state;
+        if (!locs.length) return <div>Error loading map. No initial location.</div>
+        return <Map locs={locs}/>
     }
 }
 
@@ -98,9 +98,9 @@ class Map extends Component {
 
 
     createMap() {
-        const { markers } = this.props;
+        const { locs } = this.props;
         
-        const map = L.map('mapid').setView( markers[0], 13);
+        const map = L.map('mapid').setView( locs[0], 13);
         L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
             maxZoom: 17
         }).addTo(map);
@@ -128,9 +128,7 @@ class Map extends Component {
             }
         });
 
-        var helloPopup = L.popup().setContent('Hello World!');
-
-        const markerLayers = markers.map( (mark) => L.marker(mark, {icon: markerIcon}) );
+        const markerLayers = locs.map( (loc) => L.marker(loc, {icon: markerIcon}) );
         markerLayers.forEach( (markerLayer) => markerLayer.addTo(map) );
 
             

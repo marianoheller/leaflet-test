@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Map from './Map/Map';
+import Panel from './Panel/Panel';
 import './App.css';
 
 
 const KEY_IP_LOC = '02c1559982a189';
+const KEY_GOOGLE_GEOLOC = 'AIzaSyDNc7O0ADgtJL8a2TojsvRGonJXUfSM5fo';
 
-class App extends Component {
+
+class AppContainer extends Component {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      initLoc: undefined
+      locs: [ undefined ]
     }
   }
 
@@ -27,14 +30,13 @@ class App extends Component {
       }
     })
     .then( (res) => {
-      try {
-        var loc = res.data.loc.split(",").map(Number);
-      } catch(e) {
-        console.log("Unable to parse ip location response");
-        throw e;
-      }
+      var { locs } = this.state;
+      locs =  JSON.parse(JSON.stringify(locs));
+      locs.shift();
+      
+      const initLoc = res.data.loc.split(",").map(Number);
       this.setState({
-        initLoc: loc
+        locs: [ initLoc, ...locs ]
       });
     })
     .catch( (err) => {
@@ -43,13 +45,32 @@ class App extends Component {
   }
 
   render() {
-    const { initLoc } = this.state;
+    const { locs } = this.state;
+    return (
+      <App  locs={locs}/>
+    );
+  }
+}
+
+
+
+
+class App extends Component {
+  render() {
+    const { locs } = this.props;
     return (
       <div className="App">
-        <Map initLoc={initLoc}/>
+        <div className="columns is-gapless">
+          <div className="column is-one-third">
+            <Panel />
+          </div>
+          <div className="column is-two-thirds">
+            <Map locs={locs}/>
+          </div>
+        </div>
       </div>
     );
   }
 }
 
-export default App;
+export default AppContainer;
