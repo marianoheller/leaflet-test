@@ -92,7 +92,7 @@ class App extends Component {
             <Panel locs={locs} locHelpers={locHelpers} />
           </div>
           <div className="column is-two-thirds">
-            <Map locs={locs} locHelpers={locHelpers} floatingLoc={floatingLoc}/>
+            <Map locs={locs} locHelpers={locHelpers} floatingLoc={floatingLoc} />
             <MapPopup loc={floatingLoc} locHelpers={locHelpers} />
           </div>
         </div>

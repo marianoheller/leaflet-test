@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import geocoder from 'geocoder';
-
+import './Panel.css';
 
 export default class Panel extends Component {
 
@@ -93,11 +93,45 @@ class ListMarkers extends Component {
         return (
             <aside className="menu">            
                 <ul className="menu-list">
-                    { locs.map( (loc, i) => <li key={`marker${i}`}>{loc[0].toFixed(3)},{loc[1].toFixed(3)}</li>)}
+                    { locs.map( (loc, i) => <MarkerItem key={`marker${i}`} loc={loc}/>)}
                 </ul>
             </aside>
         )
     }
 }
 
+
+class MarkerItem extends Component {
+
+    render() {
+        const { loc } = this.props;
+        return(
+            <li className="markerItem">
+                <div className="card">
+                    <header className="card-header">
+                        <p className="card-header-title">
+                            Location
+                        </p>
+                        <a className="card-header-icon" aria-label="more options">
+                            <span className="icon">
+                                <i className="fa fa-angle-down" aria-hidden="true"></i>
+                            </span>
+                        </a>
+                    </header>
+                    <div className="card-content">
+                        <div className="content">
+                            {loc[0].toFixed(3)},{loc[1].toFixed(3)}
+                            <br />
+                            <time datetime="2016-1-1">{Date.now()}</time>
+                        </div>
+                    </div>
+                    <footer className="card-footer">
+                        <a className="card-footer-item is-size-7">Edit</a>
+                        <a className="card-footer-item is-size-7">Delete</a>
+                    </footer>
+                </div>
+            </li>
+        )
+    }
+}
 
