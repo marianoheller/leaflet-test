@@ -93,7 +93,7 @@ class ListMarkers extends Component {
         return (
             <aside className="menu">            
                 <ul className="menu-list">
-                    { locs.map( (loc, i) => <li key={`marker${i}`}>{loc}</li>)}
+                    { locs.map( (loc, i) => <li key={`marker${i}`}>{loc[0].toFixed(3)},{loc[1].toFixed(3)}</li>)}
                 </ul>
             </aside>
         )

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Map from './Map/Map';
+import MapPopup from './Map/MapPopup';
 import Panel from './Panel/Panel';
 import './App.css';
 
@@ -15,7 +16,8 @@ class AppContainer extends Component {
     super(props);
 
     this.state = {
-      locs: [ undefined ]
+      locs: [],
+      floatingLoc: undefined
     }
   }
 
@@ -30,10 +32,7 @@ class AppContainer extends Component {
       }
     })
     .then( (res) => {
-      var { locs } = this.state;
-      locs =  JSON.parse(JSON.stringify(locs));
-      locs.shift();
-      
+      var { locs } = this.state;      
       const initLoc = res.data.loc.split(",").map(Number);
       this.setState({
         locs: [ initLoc, ...locs ]
@@ -44,10 +43,37 @@ class AppContainer extends Component {
     })
   }
 
+  setFloatLoc(loc) {
+    this.setState({
+      floatingLoc: loc
+    })
+  }
+
+  addLoc(loc) {
+    this.setState({
+      locs: [ ...this.state.locs, loc ],
+      floatingLoc: undefined
+    })
+  }
+
+  removeLoc(index) {
+    this.setState({
+      locs: this.state.locs.splice(index, 1)
+    })
+  }
+
   render() {
-    const { locs } = this.state;
+    const { locs, floatingLoc } = this.state;
     return (
-      <App  locs={locs}/>
+      <App  
+      locs={locs}
+      floatingLoc={floatingLoc}
+      locHelpers={{
+        add: this.addLoc.bind(this),
+        remove: this.removeLoc.bind(this),
+        setFloater: this.setFloatLoc.bind(this)
+      }}
+      />
     );
   }
 }
@@ -57,15 +83,17 @@ class AppContainer extends Component {
 
 class App extends Component {
   render() {
-    const { locs } = this.props;
+    const { locs, locHelpers, floatingLoc } = this.props;
+
     return (
       <div className="App">
         <div className="columns is-gapless">
           <div className="column is-one-third">
-            <Panel />
+            <Panel locs={locs} locHelpers={locHelpers} />
           </div>
           <div className="column is-two-thirds">
-            <Map locs={locs}/>
+            <Map locs={locs} locHelpers={locHelpers} floatingLoc={floatingLoc}/>
+            <MapPopup loc={floatingLoc} locHelpers={locHelpers} />
           </div>
         </div>
       </div>
