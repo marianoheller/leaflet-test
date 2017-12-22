@@ -88,13 +88,15 @@ class Map extends Component {
         //Remove markers
         toRemoveFlags.forEach( (e,i) => {
             if( !e ) return;
-            const targetLayer = markerLayers.find( (markerLayer, i) => {
+            const targetLayer = markerLayers.find( (markerLayer) => {
                 const objLoc = markerLayer.getLatLng();
                 return oldLocs[i][0]===objLoc.lat && oldLocs[i][1]===objLoc.lng 
             } );
             map.removeLayer(targetLayer);
+            const newMarkersLayers = [ ...markerLayers]
+            newMarkersLayers.splice(i, 1);
             this.setState({
-                markerLayers: oldLocs.splice(i, 1)
+                markerLayers: newMarkersLayers
             })
         } ); 
 

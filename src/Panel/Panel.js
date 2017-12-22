@@ -94,7 +94,12 @@ class ListMarkers extends Component {
         return (
             <aside className="menu">            
                 <ul className="menu-list">
-                    { locs.map( (loc, i) => <MarkerItem key={`marker${i}`} loc={loc} removeLoc={removeLocFactory(i)}/>)}
+                    { locs.map( (loc, i) => <MarkerItem 
+                    key={`marker${i}`} 
+                    index={`marker${i}`}
+                    loc={loc} 
+                    removeLoc={removeLocFactory(i)}
+                    />)}
                 </ul>
             </aside>
         )
@@ -123,7 +128,8 @@ class MarkerItem extends Component {
                         <div className="content">
                             {loc[0].toFixed(3)},{loc[1].toFixed(3)}
                             <br />
-                            <time dateTime={Date.now()}>{Date.now()}</time>
+                            {/* <time dateTime={Date.now()}>{Date.now()}</time> */}
+                            <div>{this.props.index}</div>
                         </div>
                     </div>
                     <footer className="card-footer">
