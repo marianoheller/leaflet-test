@@ -5,13 +5,13 @@ import './Panel.css';
 export default class Panel extends Component {
 
     render() {
-        
+        const { removeLocFactory } = this.props;
         return (
             <div id="panelContainer">
                 <div className="column is-12">
                     PANEL TITLE!
                     <InputLocation />
-                    <ListMarkers locs={this.props.locs}/>
+                    <ListMarkers locs={this.props.locs} removeLocFactory={removeLocFactory}/>
                 </div>
             </div>
         )
@@ -90,10 +90,11 @@ class ListMarkers extends Component {
 
     render() {
         const locs = this.props.locs || ["default message for no locations"];
+        const { removeLocFactory } = this.props;
         return (
             <aside className="menu">            
                 <ul className="menu-list">
-                    { locs.map( (loc, i) => <MarkerItem key={`marker${i}`} loc={loc}/>)}
+                    { locs.map( (loc, i) => <MarkerItem key={`marker${i}`} loc={loc} removeLoc={removeLocFactory(i)}/>)}
                 </ul>
             </aside>
         )
@@ -104,7 +105,7 @@ class ListMarkers extends Component {
 class MarkerItem extends Component {
 
     render() {
-        const { loc } = this.props;
+        const { loc, removeLoc } = this.props;
         return(
             <li className="markerItem">
                 <div className="card">
@@ -122,12 +123,12 @@ class MarkerItem extends Component {
                         <div className="content">
                             {loc[0].toFixed(3)},{loc[1].toFixed(3)}
                             <br />
-                            <time datetime="2016-1-1">{Date.now()}</time>
+                            <time dateTime={Date.now()}>{Date.now()}</time>
                         </div>
                     </div>
                     <footer className="card-footer">
                         <a className="card-footer-item is-size-7">Edit</a>
-                        <a className="card-footer-item is-size-7">Delete</a>
+                        <a className="card-footer-item is-size-7" onClick={removeLoc}>Delete</a>
                     </footer>
                 </div>
             </li>

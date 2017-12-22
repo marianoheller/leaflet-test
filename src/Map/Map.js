@@ -71,14 +71,12 @@ class Map extends Component {
             return [ objLoc.lat, objLoc.lng ];
         } );
 
-        const toRemove = oldLocs.filter( (oldLoc, i) => newLocs.some( (newLoc) => {
+        const toRemoveFlags = oldLocs.map( (oldLoc, i) => !newLocs.some( (newLoc) => {
             return newLoc[0]===oldLoc[0] && newLoc[1]===oldLoc[1];
         }));
         const toAdd = newLocs.filter( (newLoc) => oldLocs.every( (oldLoc) => {
             return oldLoc[0]!==newLoc[0] && oldLoc[1]!==newLoc[1];
         }));
-        
-        
 
         //Add new markers
         const newMarkers = toAdd.map( (e) =>  L.marker(e, {icon: markerIcon}) );
@@ -88,7 +86,14 @@ class Map extends Component {
         });
 
         //Remove markers
-        //toRemove.forEach( (e) => map.removeLayer(e) );
+        console.log(toRemoveFlags);
+        toRemoveFlags.forEach( (e,i) => {
+            if( !e ) return;
+            map.removeLayer(oldLocs[i]);
+            this.setState({
+                markerLayers: oldLocs.splice(i, 1)
+            })
+        } ); 
 
         //Remove floating marker
         if(!floatingLoc && floatingMarker) {

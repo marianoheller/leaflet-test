@@ -62,12 +62,21 @@ class AppContainer extends Component {
     })
   }
 
+  removeLocFactory(index) {
+    return () => {
+      this.setState({
+        locs: this.state.locs.splice(index, 1)
+      })
+    }
+  }
+
   render() {
     const { locs, floatingLoc } = this.state;
     return (
       <App  
       locs={locs}
       floatingLoc={floatingLoc}
+      removeLocFactory={this.removeLocFactory.bind(this)}
       locHelpers={{
         add: this.addLoc.bind(this),
         remove: this.removeLoc.bind(this),
@@ -83,16 +92,15 @@ class AppContainer extends Component {
 
 class App extends Component {
   render() {
-    const { locs, locHelpers, floatingLoc } = this.props;
-
+    const { locs, locHelpers, floatingLoc, removeLocFactory } = this.props;
     return (
       <div className="App">
         <div className="columns is-gapless">
           <div className="column is-one-third">
-            <Panel locs={locs} locHelpers={locHelpers} />
+            <Panel locs={locs} locHelpers={locHelpers} removeLocFactory={removeLocFactory} />
           </div>
           <div className="column is-two-thirds">
-            <Map locs={locs} locHelpers={locHelpers} floatingLoc={floatingLoc} />
+            <Map locs={locs} locHelpers={locHelpers} floatingLoc={floatingLoc}/>
             <MapPopup loc={floatingLoc} locHelpers={locHelpers} />
           </div>
         </div>
