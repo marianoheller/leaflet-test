@@ -89,7 +89,12 @@ class Map extends Component {
         console.log(toRemoveFlags);
         toRemoveFlags.forEach( (e,i) => {
             if( !e ) return;
-            map.removeLayer(oldLocs[i]);
+            console.log("Removing layer ", i, oldLocs[i]);
+            const targetLayer = markerLayers.find( (markerLayer, i) => {
+                const objLoc = markerLayer.getLatLng();
+                return oldLocs[i][0]===objLoc.lat && oldLocs[i][1]===objLoc.lng 
+            } );
+            map.removeLayer(targetLayer);
             this.setState({
                 markerLayers: oldLocs.splice(i, 1)
             })

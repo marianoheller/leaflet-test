@@ -64,8 +64,11 @@ class AppContainer extends Component {
 
   removeLocFactory(index) {
     return () => {
+      const { locs } = this.state;
+      const newLocs = [...locs];
+      newLocs.splice(index, 1);
       this.setState({
-        locs: this.state.locs.splice(index, 1)
+        locs: newLocs
       })
     }
   }
