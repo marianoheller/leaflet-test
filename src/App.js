@@ -25,7 +25,7 @@ class AppContainer extends Component {
   }
 
   getCurrentPosition() {
-    axios.get('http://ipinfo.io', {
+    axios.get('https://ipinfo.io', {
       params: {
         token: KEY_IP_LOC
       }
