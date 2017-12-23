@@ -34,7 +34,7 @@ export default class MapContainer extends Component {
 
     render() {
         const { locs, locHelpers } = this.props;
-        if (!locs.length) return <div>Error loading map. No initial location.</div>
+        /* if (!locs.length) return <div>Error loading map. No initial location.</div> */
         return <Map locs={locs} locHelpers={locHelpers} />
     }
 }
@@ -64,7 +64,7 @@ class Map extends Component {
     componentWillReceiveProps(nextProps) {
         const { map, markerLayers, floatingMarker } = this.state;
         if (!map) return;
-        
+
         const { locs: newLocs, floatingLoc } = nextProps;
         const oldLocs = markerLayers.map( (markLayer) => {
             const objLoc = markLayer.getLatLng();
@@ -81,6 +81,13 @@ class Map extends Component {
         //Add new markers
         const newMarkers = toAdd.map( (e) =>  L.marker(e, {icon: markerIcon}) );
         newMarkers.forEach( (newMarker) => newMarker.addTo(map));
+
+        //Zooms to new marker/s
+        if( newMarkers.some( (marker) => !map.getBounds().contains(marker.getLatLng()) )) {
+            const group = new L.featureGroup( newMarkers);
+            map.fitBounds(group.getBounds().pad(0.25));
+        }
+        
         this.setState({
             markerLayers: [ ...markerLayers, ...newMarkers ]
         });
@@ -112,8 +119,7 @@ class Map extends Component {
 
     createMap() {
         const { locs, locHelpers } = this.props;
-        
-        const map = L.map('mapid').setView( locs[0], 13);
+        const map = L.map('mapid').setView( locs[0] || [-31.405633, -64.191981], 12);
         L.tileLayer('https://korona.geog.uni-heidelberg.de/tiles/roads/x={x}&y={y}&z={z}', {
             maxZoom: 17
         }).addTo(map);

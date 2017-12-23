@@ -7,7 +7,6 @@ import './App.css';
 
 
 const KEY_IP_LOC = '02c1559982a189';
-const KEY_GOOGLE_GEOLOC = 'AIzaSyDNc7O0ADgtJL8a2TojsvRGonJXUfSM5fo';
 
 
 class AppContainer extends Component {
