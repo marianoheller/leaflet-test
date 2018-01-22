@@ -98,7 +98,7 @@ class App extends Component {
     const { locs, locHelpers, floatingLoc, removeLocFactory } = this.props;
     return (
       <div className="App">
-        <div className="columns is-gapless">
+        <div className="columns is-gapless" id="content-container">
           <div className="column is-one-third">
             <Panel locs={locs} locHelpers={locHelpers} removeLocFactory={removeLocFactory} />
           </div>

@@ -13,3 +13,7 @@ html, body {
 .App > div {
     height: 100%;
 }
+
+#content-container {
+    display: flex; /*So the map doesnt dissapear after width<769px*/
+}
